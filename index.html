@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Brat Image Generator ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #da70d6);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 20px;
+            animation: sparkleFloat 3s linear infinite;
+            z-index: 1000;
+        }
+
+        @keyframes sparkleFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 20px;
+            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff1493;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff1493; }
+            to { text-shadow: 0 0 30px #ff69b4, 0 0 60px #ff1493, 0 0 80px #da70d6; }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.2);
+        }
+
+        .upload-area {
+            border: 3px dashed #ff69b4;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #ff1493;
+            background: rgba(255, 105, 180, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-area.dragover {
+            border-color: #da70d6;
+            background: rgba(218, 112, 214, 0.2);
+            transform: scale(1.05);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+            margin: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
+            background: linear-gradient(45deg, #ff1493, #da70d6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .canvas-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #canvas {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: grid;
+            gap: 15px;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            margin: 10px 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 105, 180, 0.5);
+        }
+
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sticker {
+            font-size: 30px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .sticker:hover {
+            transform: scale(1.1);
+            background: rgba(255, 105, 180, 0.3);
+            border-color: #ff69b4;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+
+        .layers-panel {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .layer-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .layer-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .layer-btn {
+            background: rgba(255, 105, 180, 0.5);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            color: #ff1493;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ffb6c1;
+            border-top: 5px solid #ff1493;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .upload-area {
+                padding: 30px 15px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .draggable {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .draggable.selected {
+            border: 2px solid #ff69b4;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff69b4;
+            border-radius: 50%;
+            bottom: -5px;
+            right: -5px;
+            cursor: se-resize;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✨ Brat Image Generator ✨</h1>
+        <p>Transform your photos into fabulous brat-core masterpieces!</p>
+    </div>
+
+    <div class="container">
+        <!-- Left Panel - Upload & Effects -->
+        <div class="panel">
+            <div class="upload-area" id="uploadArea">
+                <div>📸 Drop your image here or click to upload</div>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            </div>
+            
+            <button class="btn" id="cameraBtn">📷 Take Selfie</button>
+            <video id="video" style="display: none; width: 100%; border-radius: 10px;"></video>
+            <button class="btn hidden" id="captureBtn">✨ Capture</button>
+
+            <div class="control-group">
+                <h3>🌟 Brat Effects</h3>
+                <label>Saturation: <span id="saturationValue">100%</span></label>
+                <input type="range" class="slider" id="saturation" min="50" max="200" value="100">
+                
+                <label>Pink Hue: <span id="pinkValue">0%</span></label>
+                <input type="range" class="slider" id="pinkHue" min="0" max="100" value="0">
+                
+                <label>Glam Glow: <span id="glamValue">0%</span></label>
+                <input type="range" class="slider" id="glamGlow" min="0" max="100" value="0">
+                
+                <label>Sparkle: <span id="sparkleValue">0%</span></label>
+                <input type="range" class="slider" id="sparkleIntensity" min="0" max="100" value="0">
+            </div>
+
+            <div class="control-group">
+                <h3>💄 Makeup Effects</h3>
+                <button class="btn" id="addBlush">Add Blush</button>
+                <button class="btn" id="addLipGloss">Glossy Lips</button>
+                <button class="btn" id="addEyeliner">Eyeliner</button>
+            </div>
+        </div>
+
+        <!-- Center Panel - Canvas -->
+        <div class="panel">
+            <div class="canvas-container">
+                <canvas id="canvas" width="600" height="400"></canvas>
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                <button class="btn" id="undoBtn">↶ Undo</button>
+                <button class="btn" id="redoBtn">↷ Redo</button>
+                <button class="btn" id="clearBtn">🗑️ Clear All</button>
+                <button class="btn" id="downloadBtn">💾 Download</button>
+            </div>
+        </div>
+
+        <!-- Right Panel - Stickers & Text -->
+        <div class="panel">
+            <div class="control-group">
+                <h3>✨ Brat Stickers</h3>
+                <div class="sticker-grid">
+                    <div class="sticker" data-sticker="👑">👑</div>
+                    <div class="sticker" data-sticker="💋">💋</div>
+                    <div class="sticker" data-sticker="💎">💎</div>
+                    <div class="sticker" data-sticker="🦄">🦄</div>
+                    <div class="sticker" data-sticker="🌟">🌟</div>
+                    <div class="sticker" data-sticker="💖">💖</div>
+                    <div class="sticker" data-sticker="🔥">🔥</div>
+                    <div class="sticker" data-sticker="✨">✨</div>
+                    <div class="sticker" data-sticker="💅">💅</div>
+                    <div class="sticker" data-sticker="🎀">🎀</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>📝 Add Text</h3>
+                <input type="text" class="text-input" id="textInput" placeholder="Enter brat text...">
+                <label>Font Size:</label>
+                <input type="range" class="slider" id="fontSize" min="20" max="80" value="40">
+                <label>Text Color:</label>
+                <input type="color" class="color-picker" id="textColor" value="#ff69b4">
+                <button class="btn" id="addTextBtn">Add Text</button>
+            </div>
+
+            <div class="control-group">
+                <h3>🎚️ Layers</h3>
+                <div class="layers-panel" id="layersPanel">
+                    <div class="layer-item">
+                        <span>Background Image</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div>Creating your brat masterpiece...</div>
+    </div>
+
+    <script>
+        class BratImageGenerator {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.layers = [];
+                this.history = [];
+                this.historyStep = -1;
+                this.selectedElement = null;
+                this.isDragging = false;
+                this.dragOffset = { x: 0, y: 0 };
+                this.baseImage = null;
+                
+                this.initializeEventListeners();
+                this.createSparkles();
+                this.saveState();
+            }
+
+            initializeEventListeners() {
+                // Upload functionality
+                const uploadArea = document.getElementById('uploadArea');
+                const imageInput = document.getElementById('imageInput');
+                
+                uploadArea.addEventListener('click', () => imageInput.click());
+                uploadArea.addEventListener('dragover', this.handleDragOver.bind(this));
+                uploadArea.addEventListener('drop', this.handleDrop.bind(this));
+                imageInput.addEventListener('change', this.handleImageUpload.bind(this));
+
+                // Camera functionality
+                document.getElementById('cameraBtn').addEventListener('click', this.startCamera.bind(this));
+                document.getElementById('captureBtn').addEventListener('click', this.capturePhoto.bind(this));
+
+                // Effect sliders
+                document.getElementById('saturation').addEventListener('input', this.updateEffects.bind(this));
+                document.getElementById('pinkHue').addEventListener('input', this.updateEffects.bind(this));
+                document.getElementById('glamGlow').addEventListener('input', this.updateEffects.bind(this));
+                document.getElementById('sparkleIntensity').addEventListener('input', this.updateEffects.bind(this));
+
+                // Makeup effects
+                document.getElementById('addBlush').addEventListener('click', () => this.addMakeupEffect('blush'));
+                document.getElementById('addLipGloss').addEventListener('click', () => this.addMakeupEffect('lips'));
+                document.getElementById('addEyeliner').addEventListener('click', () => this.addMakeupEffect('eyeliner'));
+
+                // Stickers
+                document.querySelectorAll('.sticker').forEach(sticker => {
+                    sticker.addEventListener('click', () => {
+                        this.addSticker(sticker.dataset.sticker);
+                    });
+                });
+
+                // Text
+                document.getElementById('addTextBtn').addEventListener('click', this.addText.bind(this));
+
+                // Canvas interactions
+                this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
+                this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
+
+                // Controls
+                document.getElementById('undoBtn').addEventListener('click', this.undo.bind(this));
+                document.getElementById('redoBtn').addEventListener('click', this.redo.bind(this));
+                document.getElementById('clearBtn').addEventListener('click', this.clearCanvas.bind(this));
+                document.getElementById('downloadBtn').addEventListener('click', this.downloadImage.bind(this));
+
+                // Update slider values
+                this.updateSliderValues();
+            }
+
+            createSparkles() {
+                setInterval(() => {
+                    if (Math.random() < 0.3) {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'sparkle';
+                        sparkle.innerHTML = ['✨', '⭐', '💫', '🌟'][Math.floor(Math.random() * 4)];
+                        sparkle.style.left = Math.random() * 100 + '%';
+                        sparkle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                        document.body.appendChild(sparkle);
+                        
+                        setTimeout(() => sparkle.remove(), 5000);
+                    }
+                }, 500);
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.loadImage(files[0]);
+                }
+            }
+
+            handleImageUpload(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    this.loadImage(file);
+                }
+            }
+
+            loadImage(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.baseImage = img;
+                        this.drawImage(img);
+                        this.saveState();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            drawImage(img) {
+                const canvasRatio = this.canvas.width / this.canvas.height;
+                const imgRatio = img.width / img.height;
+                
+                let drawWidth, drawHeight, drawX, drawY;
+                
+                if (imgRatio > canvasRatio) {
+                    drawWidth = this.canvas.width;
+                    drawHeight = this.canvas.width / imgRatio;
+                    drawX = 0;
+                    drawY = (this.canvas.height - drawHeight) / 2;
+                } else {
+                    drawWidth = this.canvas.height * imgRatio;
+                    drawHeight = this.canvas.height;
+                    drawX = (this.canvas.width - drawWidth) / 2;
+                    drawY = 0;
+                }
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+                this.redrawLayers();
+            }
+
+            async startCamera() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    video.play();
+                    document.getElementById('captureBtn').classList.remove('hidden');
+                } catch (err) {
+                    alert('Camera access denied or not available');
+                }
+            }
+
+            capturePhoto() {
+                const video = document.getElementById('video');
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.drawImage(video, 0, 0);
+                
+                const img = new Image();
+                img.onload = () => {
+                    this.baseImage = img;
+                    this.drawImage(img);
+                    this.saveState();
+                };
+                img.src = canvas.toDataURL();
+                
+                // Stop camera
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.style.display = 'none';
+                document.getElementById('captureBtn').classList.add('hidden');
+            }
+
+            updateEffects() {
+                if (!this.baseImage) return;
+                
+                const saturation = document.getElementById('saturation').value;
+                const pinkHue = document.getElementById('pinkHue').value;
+                const glamGlow = document.getElementById('glamGlow').value;
+                const sparkleIntensity = document.getElementById('sparkleIntensity').value;
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Apply filters
+                this.ctx.filter = `saturate(${saturation}%) hue-rotate(${pinkHue * 3.6}deg) blur(${glamGlow * 0.1}px)`;
+                this.drawImage(this.baseImage);
+                
+                // Add sparkle effect
+                if (sparkleIntensity > 0) {
+                    this.addSparkleEffect(sparkleIntensity);
+                }
+                
+                this.ctx.filter = 'none';
+                this.redrawLayers();
+                this.updateSliderValues();
+            }
+
+            addSparkleEffect(intensity) {
+                const sparkleCount = Math.floor(intensity / 10);
+                this.ctx.save();
+                this.ctx.globalAlpha = intensity / 100;
+                
+                for (let i = 0; i < sparkleCount; i++) {
+                    const x = Math.random() * this.canvas.width;
+                    const y = Math.random() * this.canvas.height;
+                    const size = Math.random() * 3 + 1;
+                    
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                
+                this.ctx.restore();
+            }
+
+            addMakeupEffect(type) {
+                if (!this.baseImage) return;
+                
+                const effect = {
+                    type: 'makeup',
+                    subtype: type,
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height / 2,
+                    id: Date.now()
+                };
+                
+                this.layers.push(effect);
+                this.drawMakeupEffect(effect);
+                this.saveState();
+                this.updateLayersPanel();
+            }
+
+            drawMakeupEffect(effect) {
+                this.ctx.save();
+                
+                switch (effect.subtype) {
+                    case 'blush':
+                        this.ctx.fillStyle = 'rgba(255, 105, 180, 0.2)';
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(effect.x - 80, effect.y - 20, 30, 20, 0, 0, Math.PI * 2);
+                        this.ctx.ellipse(effect.x + 80, effect.y - 20, 30, 20, 0, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        break;
+                    case 'lips':
+                        this.ctx.fillStyle = 'rgba(255, 20, 147, 0.6)';
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(effect.x, effect.y + 40, 25, 10, 0, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        break;
+                    case 'eyeliner':
+                        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                        this.ctx.lineWidth = 3;
+                        this.ctx.beginPath();
+                        this.ctx.arc(effect.x - 40, effect.y - 40, 20, 0, Math.PI, true);
+                        this.ctx.arc(effect.x + 40, effect.y - 40, 20, 0, Math.PI, true);
+                        this.ctx.stroke();
+                        break;
+                }
+                
+                this.ctx.restore();
+            }
+
+            addSticker(emoji) {
+                const sticker = {
+                    type: 'sticker',
+                    emoji: emoji,
+                    x: Math.random() * (this.canvas.width - 50) + 25,
+                    y: Math.random() * (this.canvas.height - 50) + 25,
+                    size: 40,
+                    id: Date.now()
+                };
+                
+                this.layers.push(sticker);
+                this.drawSticker(sticker);
+                this.saveState();
+                this.updateLayersPanel();
+            }
+
+            drawSticker(sticker) {
+                this.ctx.save();
+                this.ctx.font = `${sticker.size}px Arial`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText(sticker.emoji, sticker.x, sticker.y);
+                this.ctx.restore();
+            }
+
+            addText() {
+                const text = document.getElementById('textInput').value;
+                if (!text) return;
+                
+                const fontSize = document.getElementById('fontSize').value;
+                const color = document.getElementById('textColor').value;
+                
+                const textElement = {
+                    type: 'text',
+                    text: text,
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height / 2,
+                    fontSize: parseInt(fontSize),
+                    color: color,
+                    id: Date.now()
+                };
+                
+                this.layers.push(textElement);
+                this.drawText(textElement);
+                this.saveState();
+                this.updateLayersPanel();
+                document.getElementById('textInput').value = '';
+            }
+
+            drawText(textElement) {
+                this.ctx.save();
+                this.ctx.font = `bold ${textElement.fontSize}px Comic Sans MS, cursive`;
+                this.ctx.fillStyle = textElement.color;
+                this.ctx.strokeStyle = '#ffffff';
+                this.ctx.lineWidth = 2;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                // Add glow effect
+                this.ctx.shadowColor = textElement.color;
+                this.ctx.shadowBlur = 10;
+                
+                this.ctx.strokeText(textElement.text, textElement.x, textElement.y);
+                this.ctx.fillText(textElement.text, textElement.x, textElement.y);
+                this.ctx.restore();
+            }
+
+            redrawLayers() {
+                this.layers.forEach(layer => {
+                    switch (layer.type) {
+                        case 'sticker':
+                            this.drawSticker(layer);
+                            break;
+                        case 'text':
+                            this.drawText(layer);
+                            break;
+                        case 'makeup':
+                            this.drawMakeupEffect(layer);
+                            break;
+                    }
+                });
+            }
+
+            handleMouseDown(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Find clicked element
+                for (let i = this.layers.length - 1; i >= 0; i--) {
+                    const layer = this.layers[i];
+                    if (this.isPointInElement(x, y, layer)) {
+                        this.selectedElement = layer;
+                        this.isDragging = true;
+                        this.dragOffset.x = x - layer.x;
+                        this.dragOffset.y = y - layer.y;
+                        break;
+                    }
+                }
+            }
+
+            handleMouseMove(e) {
+                if (this.isDragging && this.selectedElement) {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    this.selectedElement.x = x - this.dragOffset.x;
+                    this.selectedElement.y = y - this.dragOffset.y;
+                    
+                    this.redrawCanvas();
+                }
+            }
+
+            handleMouseUp(e) {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.selectedElement = null;
+                    this.saveState();
+                }
+            }
+
+            isPointInElement(x, y, element) {
+                const tolerance = 20;
+                switch (element.type) {
+                    case 'sticker':
+                        return Math.abs(x - element.x) < tolerance && Math.abs(y - element.y) < tolerance;
+                    case 'text':
+                        const textWidth = this.ctx.measureText(element.text).width;
+                        return x >= element.x - textWidth/2 - tolerance && 
+                               x <= element.x + textWidth/2 + tolerance &&
+                               y >= element.y - element.fontSize/2 - tolerance &&
+                               y <= element.y + element.fontSize/2 + tolerance;
+                    case 'makeup':
+                        return Math.abs(x - element.x) < 50 && Math.abs(y - element.y) < 50;
+                }
+                return false;
+            }
+
+            redrawCanvas() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                if (this.baseImage) {
+                    this.updateEffects();
+                } else {
+                    this.redrawLayers();
+                }
+            }
+
+            saveState() {
+                this.historyStep++;
+                if (this.historyStep < this.history.length) {
+                    this.history.length = this.historyStep;
+                }
+                this.history.push(this.canvas.toDataURL());
+            }
+
+            undo() {
+                if (this.historyStep > 0) {
+                    this.historyStep--;
+                    this.restoreState();
+                }
+            }
+
+            redo() {
+                if (this.historyStep < this.history.length - 1) {
+                    this.historyStep++;
+                    this.restoreState();
+                }
+            }
+
+            restoreState() {
+                const img = new Image();
+                img.onload = () => {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.ctx.drawImage(img, 0, 0);
+                };
+                img.src = this.history[this.historyStep];
+            }
+
+            clearCanvas() {
+                if (confirm('Are you sure you want to clear everything?')) {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.layers = [];
+                    this.baseImage = null;
+                    this.saveState();
+                    this.updateLayersPanel();
+                }
+            }
+
+            updateLayersPanel() {
+                const panel = document.getElementById('layersPanel');
+                panel.innerHTML = '<div class="layer-item"><span>Background Image</span></div>';
+                
+                this.layers.forEach((layer, index) => {
+                    const layerDiv = document.createElement('div');
+                    layerDiv.className = 'layer-item';
+                    layerDiv.innerHTML = `
+                        <span>${layer.type === 'sticker' ? layer.emoji : layer.type === 'text' ? layer.text : layer.subtype}</span>
+                        <div class="layer-controls">
+                            <button class="layer-btn" onclick="bratGenerator.moveLayerUp(${index})">↑</button>
+                            <button class="layer-btn" onclick="bratGenerator.moveLayerDown(${index})">↓</button>
+                            <button class="layer-btn" onclick="bratGenerator.deleteLayer(${index})">✕</button>
+                        </div>
+                    `;
+                    panel.appendChild(layerDiv);
+                });
+            }
+
+            moveLayerUp(index) {
+                if (index < this.layers.length - 1) {
+                    [this.layers[index], this.layers[index + 1]] = [this.layers[index + 1], this.layers[index]];
+                    this.redrawCanvas();
+                    this.saveState();
+                    this.updateLayersPanel();
+                }
+            }
+
+            moveLayerDown(index) {
+                if (index > 0) {
+                    [this.layers[index], this.layers[index - 1]] = [this.layers[index - 1], this.layers[index]];
+                    this.redrawCanvas();
+                    this.saveState();
+                    this.updateLayersPanel();
+                }
+            }
+
+            deleteLayer(index) {
+                this.layers.splice(index, 1);
+                this.redrawCanvas();
+                this.saveState();
+                this.updateLayersPanel();
+            }
+
+            updateSliderValues() {
+                document.getElementById('saturationValue').textContent = document.getElementById('saturation').value + '%';
+                document.getElementById('pinkValue').textContent = document.getElementById('pinkHue').value + '%';
+                document.getElementById('glamValue').textContent = document.getElementById('glamGlow').value + '%';
+                document.getElementById('sparkleValue').textContent = document.getElementById('sparkleIntensity').value + '%';
+            }
+
+            downloadImage() {
+                const loading = document.getElementById('loading');
+                loading.style.display = 'block';
+                
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.download = 'brat-masterpiece.png';
+                    link.href = this.canvas.toDataURL();
+                    link.click();
+                    loading.style.display = 'none';
+                }, 1000);
+            }
+        }
+
+        // Initialize the app
+        const bratGenerator = new BratImageGenerator();
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'z':
+                        e.preventDefault();
+                        bratGenerator.undo();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        bratGenerator.redo();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        bratGenerator.downloadImage();
+                        break;
+                }
+            }
+        });
+
+        // Add touch support for mobile
+        let touchStartX, touchStartY;
+        
+        bratGenerator.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = bratGenerator.canvas.getBoundingClientRect();
+            touchStartX = touch.clientX - rect.left;
+            touchStartY = touch.clientY - rect.top;
+            
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            bratGenerator.canvas.dispatchEvent(mouseEvent);
+        });
+
+        bratGenerator.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            bratGenerator.canvas.dispatchEvent(mouseEvent);
+        });
+
+        bratGenerator.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            bratGenerator.canvas.dispatchEvent(mouseEvent);
+        });
+
+        // Add social sharing functionality
+        function shareToSocial(platform) {
+            const canvas = bratGenerator.canvas;
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const shareData = {
+                    title: 'Check out my Brat masterpiece!',
+                    text: 'Created with the Brat Image Generator ✨',
+                    url: url
+                };
+                
+                if (navigator.share) {
+                    navigator.share(shareData);
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'brat-masterpiece.png';
+                    link.click();
+                }
+            });
+        }
+
+        // Add preset brat text options
+        const bratTexts = [
+            'BRAT', 'SLAY', 'ICONIC', 'SERVE', 'QUEEN', 'PURR', 'PERIOD', 'NO CAP',
+            'MAIN CHARACTER', 'IT GIRL', 'THAT GIRL', 'BOSS BABE', 'DIVINE', 'FLAWLESS'
+        ];
+
+        // Add preset text buttons
+        const textGroup = document.querySelector('.control-group:has(#textInput)');
+        const presetDiv = document.createElement('div');
+        presetDiv.innerHTML = '<h4 style="margin: 10px 0 5px 0; font-size: 14px;">Quick Brat Text:</h4>';
+        
+        const presetGrid = document.createElement('div');
+        presetGrid.style.display = 'grid';
+        presetGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        presetGrid.style.gap = '5px';
+        presetGrid.style.marginBottom = '10px';
+
+        bratTexts.slice(0, 8).forEach(text => {
+            const btn = document.createElement('button');
+            btn.textContent = text;
+            btn.className = 'btn';
+            btn.style.fontSize = '12px';
+            btn.style.padding = '8px 12px';
+            btn.addEventListener('click', () => {
+                document.getElementById('textInput').value = text;
+                bratGenerator.addText();
+            });
+            presetGrid.appendChild(btn);
+        });
+
+        presetDiv.appendChild(presetGrid);
+        textGroup.insertBefore(presetDiv, document.getElementById('textInput'));
+
+        // Add Easter eggs
+        let clickCount = 0;
+        document.querySelector('.header h1').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 5) {
+                document.body.style.animation = 'rainbow 1s ease-in-out';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                }, 1000);
+                clickCount = 0;
+            }
+        });
+
+        // Add rainbow animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rainbow {
+                0% { filter: hue-rotate(0deg); }
+                25% { filter: hue-rotate(90deg); }
+                50% { filter: hue-rotate(180deg); }
+                75% { filter: hue-rotate(270deg); }
+                100% { filter: hue-rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
